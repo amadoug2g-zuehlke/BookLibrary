@@ -12,6 +12,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.BookLibrary"
+        android:name=".framework.di.BookSearchApplication"
         tools:targetApi="31">
         <activity
             android:name=".ui.MainActivity"

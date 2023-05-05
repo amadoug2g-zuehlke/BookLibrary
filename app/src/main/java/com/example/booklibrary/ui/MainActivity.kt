@@ -9,12 +9,14 @@ import com.example.booklibrary.framework.network.BookApi
 import com.example.booklibrary.framework.network.repository.BookRepositoryImpl
 import com.example.booklibrary.framework.network.source.RemoteDataSourceImpl
 import com.example.booklibrary.ui.home.viewmodel.BookViewModelFactory
+import com.example.core.usecase.SearchBooksUC
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    //private var viewModel1 : BookViewModel by activityViewModels()
-    private lateinit var viewModel: BookViewModel
+    private lateinit var fragmentViewModel: BookViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,16 +25,17 @@ class MainActivity : AppCompatActivity() {
         val view = binding.root
         setContentView(view)
 
-        setupViewModel()
+        //setupViewModel()
     }
 
     private fun setupViewModel() {
         val bookApi = BookApi
         val dataSource = RemoteDataSourceImpl(bookApi)
         val repository = BookRepositoryImpl(dataSource)
+        val searchBooksUC = SearchBooksUC(repository)
 
-        val factory = BookViewModelFactory(repository)
+        val factory = BookViewModelFactory(searchBooksUC)
 
-        viewModel = ViewModelProvider(this,factory)[BookViewModel::class.java]
+        fragmentViewModel = ViewModelProvider(this,factory)[BookViewModel::class.java]
     }
 }

@@ -1,19 +1,22 @@
 package com.example.booklibrary.ui.home.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.*
 import com.example.booklibrary.framework.network.repository.BookRepositoryImpl
 import com.example.core.domain.BookSearchUIState
 import com.example.core.domain.model.ApiResponse
+import com.example.core.usecase.SearchBooksUC
 import com.example.core.utils.State
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import retrofit2.http.Query
+import kotlinx.coroutines.flow.*
+import javax.inject.Inject
 
-class BookViewModel(private val repository: BookRepositoryImpl) : ViewModel() {
+@HiltViewModel
+class BookViewModel @Inject constructor(private val searchBooksUC: SearchBooksUC) : ViewModel() {
     //region Variables
     private val _uiState = MutableStateFlow(BookSearchUIState())
     val uiState: StateFlow<BookSearchUIState> = _uiState.asStateFlow()
@@ -25,26 +28,28 @@ class BookViewModel(private val repository: BookRepositoryImpl) : ViewModel() {
     }
 
     fun getResult(query: String) {
-        viewModelScope.launch {
-            val response = repository.searchBooks(query)
+        if (query.isNotEmpty()) {
+            viewModelScope.launch {
+                searchBooksUC.invoke(query).onStart {
+                    setLoadingStatus(true)
+                }.collect { state ->
+                    when (state) {
+                        is State.Loading -> setLoadingStatus(true)
+                        is State.Success -> {
+                            val result = state.data
 
-            response.collect { state ->
-                when (state) {
-                    is State.Loading -> setLoadingStatus(true)
-                    is State.Success -> {
-                        val result = state.data
-
-                        when (result.code()) {
-                            200 -> {
-                                setLoadingStatus(false)
-                                setQuery(result.body())
-                            }
-                            else -> {
-                                setErrorMessage(result.errorBody().toString())
+                            when (result.code()) {
+                                200 -> {
+                                    setLoadingStatus(false)
+                                    setQuery(result.body())
+                                }
+                                else -> {
+                                    setErrorMessage("${result.errorBody()} (${result.code()})")
+                                }
                             }
                         }
+                        is State.Failed -> setErrorMessage(state.message)
                     }
-                    is State.Failed -> setErrorMessage(state.message)
                 }
             }
         }
@@ -68,11 +73,11 @@ class BookViewModel(private val repository: BookRepositoryImpl) : ViewModel() {
     //endregion
 }
 
-class BookViewModelFactory(private val repository: BookRepositoryImpl) :
+class BookViewModelFactory @Inject constructor(private val searchBooksUC: SearchBooksUC) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return modelClass.getConstructor(
-            BookRepositoryImpl::class.java
-        ).newInstance(repository)
+            SearchBooksUC::class.java
+        ).newInstance(searchBooksUC)
     }
 }

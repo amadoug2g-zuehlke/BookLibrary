@@ -16,8 +16,10 @@ import com.example.booklibrary.databinding.FragmentBookDetailsBinding
 import com.example.booklibrary.databinding.FragmentBookListBinding
 import com.example.booklibrary.ui.home.viewmodel.BookViewModel
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class BookListFragment : Fragment() {
 
     //region Variables
@@ -42,13 +44,7 @@ class BookListFragment : Fragment() {
     //region Setup
     private fun setupViews() {
         binding.button.setOnClickListener {
-            try {
-                val input = binding.inputEditText.text.toString()
-
-                if (input.isNotEmpty()) viewModel.getResult(binding.inputEditText.text.toString())
-            } catch (e: Exception) {
-                showError(e.localizedMessage)
-            }
+            viewModel.getResult(binding.inputEditText.text.toString())
         }
 
         hideLoading()
@@ -62,7 +58,8 @@ class BookListFragment : Fragment() {
 
                 state.apiResponse?.apply {
                     binding.responseKind.visibility = if (kind == "") View.GONE else View.VISIBLE
-                    binding.responseCount.visibility = if (totalItems == 0) View.GONE else View.VISIBLE
+                    binding.responseCount.visibility =
+                        if (totalItems == 0) View.GONE else View.VISIBLE
                 }
 
                 if (state.errorMessage.isNotEmpty()) showError()
@@ -89,7 +86,7 @@ class BookListFragment : Fragment() {
     private fun showError(message: String? = "") {
         Snackbar.make(
             binding.progressBar,
-            if (!message.isNullOrEmpty()) message else viewModel.uiState.value.errorMessage.toString(),
+            if (!message.isNullOrEmpty()) message else viewModel.uiState.value.errorMessage,
             Snackbar.LENGTH_LONG
         )
             .setTextColor(Color.WHITE)

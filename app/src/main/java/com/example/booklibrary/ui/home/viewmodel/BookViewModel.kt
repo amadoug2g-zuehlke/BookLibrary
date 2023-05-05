@@ -1,7 +1,7 @@
 package com.example.booklibrary.ui.home.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.*
-import com.example.booklibrary.framework.network.repository.BookRepositoryImpl
 import com.example.core.domain.BookSearchUIState
 import com.example.core.domain.model.ApiResponse
 import com.example.core.usecase.SearchBooksUC
@@ -17,16 +17,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class BookViewModel @Inject constructor(private val searchBooksUC: SearchBooksUC) : ViewModel() {
+
     //region Variables
     private val _uiState = MutableStateFlow(BookSearchUIState())
     val uiState: StateFlow<BookSearchUIState> = _uiState.asStateFlow()
     //endregion
 
     //region Functions
-    init {
-        _uiState.update { state -> state.copy(isLoading = false, errorMessage = "") }
-    }
-
     fun getResult(query: String) {
         if (query.isNotEmpty()) {
             viewModelScope.launch {
@@ -34,19 +31,10 @@ class BookViewModel @Inject constructor(private val searchBooksUC: SearchBooksUC
                     setLoadingStatus(true)
                 }.collect { state ->
                     when (state) {
-                        is State.Loading -> setLoadingStatus(true)
+                        is State.Loading -> setErrorMessage()
                         is State.Success -> {
-                            val result = state.data
-
-                            when (result.code()) {
-                                200 -> {
-                                    setLoadingStatus(false)
-                                    setQuery(result.body())
-                                }
-                                else -> {
-                                    setErrorMessage("${result.errorBody()} (${result.code()})")
-                                }
-                            }
+                            setErrorMessage()
+                            setQuery(state.data)
                         }
                         is State.Failed -> setErrorMessage(state.message)
                     }
@@ -62,11 +50,13 @@ class BookViewModel @Inject constructor(private val searchBooksUC: SearchBooksUC
     }
 
     private fun setQuery(query: ApiResponse?) {
+        Log.i("Tag", "$query")
         _uiState.update { state -> state.copy(apiResponse = query) }
     }
 
     private fun setErrorMessage(message: String = "") {
-        _uiState.update { state -> state.copy(errorMessage = message) }
+        if (message.isEmpty()) _uiState.update { state -> state.copy(errorMessage = message) }
+
         setLoadingStatus(false)
         _uiState.update { state -> state.copy(errorMessage = "") }
     }

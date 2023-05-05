@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 import retrofit2.Response
 
 class RemoteDataSourceImpl(private val apiService: BookApi): RemoteDataSource {
-    override suspend fun searchBooks(queryTerms: String): Response<ApiResponse> {
+    override suspend fun searchBooks(queryTerms: String): ApiResponse {
         return apiService.BookService.searchBooks(queryTerms)
     }
 }

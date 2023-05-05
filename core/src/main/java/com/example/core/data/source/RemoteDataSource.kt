@@ -8,5 +8,5 @@ import retrofit2.http.Query
 
 interface RemoteDataSource {
     @GET("volumes")
-    suspend fun searchBooks(@Query("q") queryTerms: String): Response<ApiResponse>
+    suspend fun searchBooks(@Query("q") queryTerms: String): ApiResponse
 }

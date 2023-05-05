@@ -6,5 +6,5 @@ import kotlinx.coroutines.flow.Flow
 import retrofit2.Response
 
 interface BookRepository {
-    suspend fun searchBooks(queryTerms: String): Flow<State<Response<ApiResponse>>>
+    suspend fun searchBooks(queryTerms: String): Flow<State<ApiResponse>>
 }

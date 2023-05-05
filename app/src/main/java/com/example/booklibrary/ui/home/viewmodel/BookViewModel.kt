@@ -3,34 +3,48 @@ package com.example.booklibrary.ui.home.viewmodel
 import android.util.Log
 import androidx.lifecycle.*
 import com.example.booklibrary.framework.network.repository.BookRepositoryImpl
+import com.example.core.domain.BookSearchUIState
 import com.example.core.domain.model.ApiResponse
+import com.example.core.utils.State
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import retrofit2.http.Query
 
 class BookViewModel(private val repository: BookRepositoryImpl) : ViewModel() {
     //region Variables
-    private val _searchQuery = MutableLiveData<String>()
-    val searchQuery: LiveData<String> = _searchQuery
-
-    private val _searchResult = MutableLiveData<ApiResponse>()
-    val searchResult: LiveData<ApiResponse> = _searchResult
-
-    private val _errorMessage = MutableLiveData<String>()
-    val errorMessage: LiveData<String> = _errorMessage
+    private val _uiState = MutableStateFlow(BookSearchUIState())
+    val uiState: StateFlow<BookSearchUIState> = _uiState.asStateFlow()
     //endregion
 
     //region Functions
-    fun getResult() {
-        viewModelScope.launch {
-            val response = repository.searchBooks("Agatha Christie")
+    init {
+        _uiState.update { state -> state.copy(isLoading = false, errorMessage = "") }
+    }
 
-            when (response.code()) {
-                200 -> {
-                    _searchResult.value = response.body()
-                    Log.i("TAG", "result: ${_searchResult.value}")
-                }
-                else -> {
-                    _errorMessage.value = response.errorBody().toString()
-                    Log.i("TAG", "result: ${_errorMessage.value}")
+    fun getResult(query: String) {
+        viewModelScope.launch {
+            val response = repository.searchBooks(query)
+
+            response.collect { state ->
+                when (state) {
+                    is State.Loading -> setLoadingStatus(true)
+                    is State.Success -> {
+                        val result = state.data
+
+                        when (result.code()) {
+                            200 -> {
+                                setLoadingStatus(false)
+                                setQuery(result.body())
+                            }
+                            else -> {
+                                setErrorMessage(result.errorBody().toString())
+                            }
+                        }
+                    }
+                    is State.Failed -> setErrorMessage(state.message)
                 }
             }
         }
@@ -38,6 +52,19 @@ class BookViewModel(private val repository: BookRepositoryImpl) : ViewModel() {
     //endregion
 
     //region Observers
+    private fun setLoadingStatus(value: Boolean) {
+        _uiState.update { state -> state.copy(isLoading = value) }
+    }
+
+    private fun setQuery(query: ApiResponse?) {
+        _uiState.update { state -> state.copy(apiResponse = query) }
+    }
+
+    private fun setErrorMessage(message: String = "") {
+        _uiState.update { state -> state.copy(errorMessage = message) }
+        setLoadingStatus(false)
+        _uiState.update { state -> state.copy(errorMessage = "") }
+    }
     //endregion
 }
 

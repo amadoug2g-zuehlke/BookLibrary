@@ -1,4 +1,4 @@
-package com.example.booklibrary.ui.home.fragment
+package com.example.booklibrary.ui.home.adapter
 
 import androidx.recyclerview.widget.DiffUtil
 import com.example.core.domain.model.Volume

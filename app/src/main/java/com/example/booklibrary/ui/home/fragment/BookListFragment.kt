@@ -14,7 +14,9 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.booklibrary.R
 import com.example.booklibrary.databinding.FragmentBookListBinding
-import com.example.booklibrary.ui.home.viewmodel.BookViewModel
+import com.example.booklibrary.ui.home.adapter.BookAction
+import com.example.booklibrary.ui.home.adapter.BookVolumeAdapter
+import com.example.booklibrary.ui.viewmodel.BookViewModel
 import com.example.core.domain.model.VolumeInfo
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -65,16 +67,17 @@ class BookListFragment : Fragment(), BookAction {
     private fun setupObservers() {
         lifecycleScope.launch {
             viewModel.uiState.collect { state ->
-                if (state.isLoading) showLoading() else hideLoading()
                 binding.state = state
+                if (state.isLoading) showLoading() else hideLoading()
+                if (state.errorMessage.isNotEmpty()) showError()
 
                 state.apiResponse?.apply {
                     items.let { bookVolumeAdapter.setData(it) }
                     binding.responseKind.visibility = if (kind == "") View.GONE else View.VISIBLE
-                    binding.responseCount.visibility = if (totalItems == 0) View.GONE else View.VISIBLE
+                    binding.responseCount.visibility =
+                        if (totalItems == 0) View.GONE else View.VISIBLE
                 }
 
-                if (state.errorMessage.isNotEmpty()) showError()
             }
         }
     }

@@ -1,6 +1,5 @@
-package com.example.booklibrary.ui.home.viewmodel
+package com.example.booklibrary.ui.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.*
 import com.example.core.domain.BookSearchUIState
 import com.example.core.domain.model.ApiResponse
@@ -31,12 +30,16 @@ class BookViewModel @Inject constructor(private val searchBooksUC: SearchBooksUC
                     setLoadingStatus(true)
                 }.collect { state ->
                     when (state) {
-                        is State.Loading -> setErrorMessage()
+                        is State.Loading -> {
+                            setErrorMessage()
+                        }
                         is State.Success -> {
                             setErrorMessage()
                             setQuery(state.data)
                         }
-                        is State.Failed -> setErrorMessage(state.message)
+                        is State.Failed -> {
+                            setErrorMessage(state.message)
+                        }
                     }
                 }
             }
@@ -50,7 +53,6 @@ class BookViewModel @Inject constructor(private val searchBooksUC: SearchBooksUC
     }
 
     private fun setQuery(query: ApiResponse?) {
-        Log.i("Tag", "$query")
         _uiState.update { state -> state.copy(apiResponse = query) }
     }
 

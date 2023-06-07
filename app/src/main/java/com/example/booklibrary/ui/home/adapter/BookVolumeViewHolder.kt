@@ -1,4 +1,4 @@
-package com.example.booklibrary.ui.home.fragment
+package com.example.booklibrary.ui.home.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

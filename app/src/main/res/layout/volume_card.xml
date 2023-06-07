@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
+
         <variable
             name="volume"
             type="com.example.core.domain.model.Volume" />
@@ -11,79 +12,79 @@
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
-            android:elevation="16dp"
+            android:layout_height="140dp"
             android:layout_margin="8dp"
-            app:cardCornerRadius="16dp"
-            android:layout_height="140dp">
+            android:elevation="16dp"
+            app:cardCornerRadius="16dp">
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:orientation="vertical"
                 android:layout_marginTop="8dp"
-                android:layout_height="wrap_content">
+                android:orientation="vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:text="@{volume.volumeInfo.title}"
-                    android:textSize="24sp"
-                    android:layout_height="wrap_content"/>
+                    android:textSize="20sp" />
 
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:overScrollMode="always"
-                        android:maxLines="1"
-                        android:text="@{volume.volumeInfo.authors.toString()}"
-                        android:textSize="18sp"
-                        android:layout_height="wrap_content"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:overScrollMode="always"
+                    android:text="@{volume.volumeInfo.authors.toString()}"
+                    android:textSize="16sp" />
 
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:overScrollMode="always"
-                        android:maxLines="1"
-                        android:text="@{volume.volumeInfo.publishedDate}"
-                        android:textSize="16sp"
-                        android:layout_height="wrap_content"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:overScrollMode="always"
+                    android:text="@{volume.volumeInfo.publishedDate}"
+                    android:textSize="12sp" />
 
 
                 <androidx.appcompat.widget.LinearLayoutCompat
                     android:layout_width="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp">
 
                     <TextView
                         android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:text="@{Integer.toString(volume.volumeInfo.pageCount)}"
-                        android:textSize="14sp"
-                        android:layout_height="wrap_content"/>
+                        android:textSize="11sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:text="@{`|` + Double.toString(volume.volumeInfo.averageRating)}"
-                        android:textSize="14sp"
-                        android:layout_height="wrap_content"/>
+                        android:textSize="11sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:text="@{`|` + volume.volumeInfo.ratingsCount}"
-                        android:textSize="14sp"
-                        android:layout_height="wrap_content"/>
+                        android:textSize="11sp" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
-
                 <TextView
                     android:layout_width="wrap_content"
-                    android:overScrollMode="always"
-                    android:maxLines="1"
-                    android:text="@{volume.volumeInfo.categories.toString()}"
-                    android:textSize="16sp"
+                    android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
-                    android:layout_height="wrap_content"/>
+                    android:maxLines="1"
+                    android:overScrollMode="always"
+                    android:text="@{volume.volumeInfo.categories.toString()}"
+                    android:textSize="12sp" />
 
 
             </androidx.appcompat.widget.LinearLayoutCompat>

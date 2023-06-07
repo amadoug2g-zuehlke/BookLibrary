@@ -1,13 +1,9 @@
-package com.example.booklibrary.ui.home.fragment
+package com.example.booklibrary.ui.home.adapter
 
-import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.example.booklibrary.R
-import com.example.booklibrary.databinding.VolumeCardBinding
 import com.example.core.domain.model.Volume
-import com.example.core.domain.model.VolumeInfo
 
 class BookVolumeAdapter(private var action: BookAction) :
     RecyclerView.Adapter<BookVolumeViewHolder>() {

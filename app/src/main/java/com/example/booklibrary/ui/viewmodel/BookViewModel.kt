@@ -1,7 +1,7 @@
-package com.example.booklibrary.ui.home.viewmodel
+package com.example.booklibrary.ui.viewmodel
 
-import android.util.Log
-import androidx.lifecycle.*
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.core.domain.BookSearchUIState
 import com.example.core.domain.model.ApiResponse
 import com.example.core.usecase.SearchBooksUC
@@ -10,9 +10,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -32,10 +32,11 @@ class BookViewModel @Inject constructor(private val searchBooksUC: SearchBooksUC
                 }.collect { state ->
                     when (state) {
                         is State.Loading -> setErrorMessage()
-                        is State.Success -> {
+                        is State.Success<*> -> {
                             setErrorMessage()
-                            setQuery(state.data)
+                            setQuery(state.data as ApiResponse)
                         }
+
                         is State.Failed -> setErrorMessage(state.message)
                     }
                 }
@@ -50,7 +51,6 @@ class BookViewModel @Inject constructor(private val searchBooksUC: SearchBooksUC
     }
 
     private fun setQuery(query: ApiResponse?) {
-        Log.i("Tag", "$query")
         _uiState.update { state -> state.copy(apiResponse = query) }
     }
 
@@ -63,11 +63,3 @@ class BookViewModel @Inject constructor(private val searchBooksUC: SearchBooksUC
     //endregion
 }
 
-class BookViewModelFactory @Inject constructor(private val searchBooksUC: SearchBooksUC) :
-    ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return modelClass.getConstructor(
-            SearchBooksUC::class.java
-        ).newInstance(searchBooksUC)
-    }
-}
